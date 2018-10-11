@@ -1,0 +1,3 @@
+[submodule "text2vec"]
+	path = text2vec
+	url = git@github.com:crownpku/text2vec.git
