@@ -1,6 +1,4 @@
-# WikiCluster
-
-
+# WikiCategorizer
 
 ## Time plan
 The weeks refer to the semester weeks. 
