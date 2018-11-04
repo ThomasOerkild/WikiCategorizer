@@ -2,6 +2,11 @@ import os
 from generate_corpus import GenerateCorpus
 import gensim
 import re
+import multiprocessing as mp
+
+
+# Parallel flag
+parallel = True
 
 # Wiki file path (Not full path just Documents/text etc)
 wiki_path = "Documents/text"
@@ -18,16 +23,42 @@ files = [file for sublist in [[os.path.join(i[0], j) for j in i[2]] for i in os.
 # Limit amount of files during testing
 files = files[:2]
 
-# collect statistics about all tokens
-dictionary = gensim.corpora.Dictionary()
-for doc in files:
-    print(doc)
-    with open(doc, 'r') as f:
-        pages = re.split("<|>", f.read())
-        for i in range(2, len(pages), 4):
-            tmp = gensim.corpora.Dictionary(page.split() for page in pages)
-            tmp.compactify()
-            dictionary.merge_with(tmp)
+# Build dictionary
+if parallel:
+    dictionaries = [gensim.corpora.Dictionary()] * len(files)
+
+
+    def build_dict(args):
+        dictionary = args[0]
+        doc = args[1]
+        print(doc)
+        with open(doc, 'r') as f:
+            pages = re.split("<|>", f.read())
+            for i in range(2, len(pages), 4):
+                tmp = gensim.corpora.Dictionary(page.split() for page in pages)
+                tmp.compactify()
+                dictionary.merge_with(tmp)
+        return dictionary
+
+    # Multiprocessing
+    args = zip(dictionaries, files)
+    pool = mp.Pool(processes=8)
+    results = pool.map(build_dict, args)
+
+    # Join results
+    dictionary = gensim.corpora.Dictionary()
+    for result in results:
+        dictionary.merge_with(result)
+else:
+    dictionary = gensim.corpora.Dictionary()
+    for doc in files:
+        print(doc)
+        with open(doc, 'r') as f:
+            pages = re.split("<|>", f.read())
+            for i in range(2, len(pages), 4):
+                tmp = gensim.corpora.Dictionary(page.split() for page in pages)
+                tmp.compactify()
+                dictionary.merge_with(tmp)
 
 # Save dictionary to file
 dict_file = os.path.join(home, out_path, "wiki_dict.dict")
