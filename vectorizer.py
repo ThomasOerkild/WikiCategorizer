@@ -3,22 +3,21 @@ from generate_corpus import GenerateCorpus
 import gensim
 import re
 import multiprocessing as mp
-
+import glob
 
 # Parallel flag
 parallel = True
 
 # Wiki file path (Not full path just Documents/text etc)
-wiki_path = "Documents/text"
+wiki_path = os.path.join("Documents", "text")
 
 # Output path for corpus and dictionary
-out_path = "Documents/WikiCluster"
+out_path = os.path.join("Documents", "WikiCluster")
 
 # Get all file names
 home = os.path.expanduser("~")
 path = os.path.join(home, wiki_path)
-files = [file for sublist in [[os.path.join(i[0], j) for j in i[2]] for i in os.walk(path)]
-         for file in sublist if not file.endswith(".DS_Store")]
+files = glob.glob(os.path.join(path, "**/wiki_*"), recursive=True)
 
 # Limit amount of files during testing
 files = files[:2]
