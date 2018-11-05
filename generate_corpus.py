@@ -1,4 +1,4 @@
-import re
+import xml.etree.ElementTree as ET
 
 class GenerateCorpus(object):
     def __init__(self, filenames, dictionary):
@@ -8,6 +8,9 @@ class GenerateCorpus(object):
     def __iter__(self):
         for doc in self.filenames:
             with open(doc, 'r') as f:
-                pages = re.split("<|>", f.read())
-                for i in range(2, len(pages), 4):
-                    yield self.dictionary.doc2bow(pages[i].split())
+                # The wiki files don't have a root, so it's not valid xml.
+                # Therefore we enclose the document in a root tag
+                doc_file = ET.fromstringlist(["<root>", f.read(), "</root>"])
+                docs = [doc.text.split() for doc in doc_file]
+                for doc in docs:
+                    yield self.dictionary.doc2bow(doc.text.split())
