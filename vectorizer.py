@@ -4,6 +4,7 @@ import gensim
 import re
 import multiprocessing as mp
 import glob
+import xml.etree.ElementTree as ET
 
 # Parallel flag
 parallel = True
@@ -22,22 +23,25 @@ files = glob.glob(os.path.join(path, "**/wiki_*"), recursive=True)
 # Limit amount of files during testing
 files = files[:2]
 
+def merge_file_with_dict(dictionary, file_path):
+    with open(file_path, 'r') as f:
+        # The wiki files don't have a root, so it's not valid xml.
+        # Therefore we enclose the document in a root tag
+        doc_file = ET.fromstringlist(["<root>", f.read(), "</root>"])
+        docs = [doc.text.split() for doc in doc_file]
+        tmp = gensim.corpora.Dictionary(docs)
+        tmp.compactify()
+        dictionary.merge_with(tmp)
+    return dictionary
+
 # Build dictionary
 if parallel:
     dictionaries = [gensim.corpora.Dictionary()] * len(files)
 
-
     def build_dict(args):
         dictionary = args[0]
         doc = args[1]
-        print(doc)
-        with open(doc, 'r') as f:
-            pages = re.split("<|>", f.read())
-            for i in range(2, len(pages), 4):
-                tmp = gensim.corpora.Dictionary(page.split() for page in pages)
-                tmp.compactify()
-                dictionary.merge_with(tmp)
-        return dictionary
+        return merge_file_with_dict(dictionary, doc)
 
     # Multiprocessing
     args = zip(dictionaries, files)
@@ -50,14 +54,7 @@ if parallel:
         dictionary.merge_with(result)
 else:
     dictionary = gensim.corpora.Dictionary()
-    for doc in files:
-        print(doc)
-        with open(doc, 'r') as f:
-            pages = re.split("<|>", f.read())
-            for i in range(2, len(pages), 4):
-                tmp = gensim.corpora.Dictionary(page.split() for page in pages)
-                tmp.compactify()
-                dictionary.merge_with(tmp)
+    for file in files: merge_file_with_dict(dictionary, file)
 
 # Save dictionary to file
 dict_file = os.path.join(home, out_path, "wiki_dict.dict")
