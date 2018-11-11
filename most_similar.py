@@ -4,21 +4,13 @@ from gensim.models.doc2vec import Doc2Vec
 from urllib.request import urlopen
 import json
 
+
 parser = argparse.ArgumentParser(description='Compute most similar wikipedia articles')
 parser.add_argument('--filename', type=str, required=True, help="Name of file containing a text.")
 parser.add_argument('--modelname', type=str, required=True, help="Name of saved model.")
 parser.add_argument('-n', type=int, default=50, help="Number of similar documents to find.")
 
-VECTOR_SIZE = 100
-MIN_COUNT = 2
-WORKERS = 4
-
 BASE_WIKI_QUERY = "https://en.wikipedia.org/w/api.php?action=query&format=json&pageids="
-
-def _load_model(modelname):
-    model = Doc2Vec(vector_size=VECTOR_SIZE, min_count=MIN_COUNT, workers=WORKERS)
-    model.load(modelname)
-    return model
 
 def _get_title_from_pageids(ids):
     ids = '|'.join(ids)
@@ -46,8 +38,6 @@ def _main(filename, modelname, n):
     print("TITLE \t SIMILARITY SCORE")
     for i in range(n):
         print(str(titles[i]) + "\t" + str(sims[i][1]))
-
-
 
 
 if __name__ == "__main__":
