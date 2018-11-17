@@ -1,4 +1,4 @@
-from generate_corpus import GenerateTaggedDocuments
+from tagged_document_generator import GenerateTaggedDocuments
 import os
 import glob
 from gensim.models.doc2vec import Doc2Vec
@@ -19,8 +19,5 @@ model.save("my_doc2vec_model_untrained")
 print("Training...")
 model.train(trian_corpus, total_examples=model.corpus_count, epochs=model.epochs, report_delay=10)
 print("Done training.")
-
-#inferred_vector = model.infer_vector(test_string)
-#sims = model.docvecs.most_similar([inferred_vector], topn=len(model.docvecs))
 
 model.save("my_doc2vec_model_trained")
