@@ -1,5 +1,22 @@
 # WikiCategorizer
 
+## Quick start
+Inference locally:
+```
+python most_similar.py -m /path/to/trained_doc2vec_Model -n 10 < testfile.txt
+```
+
+To run inference on a web service, start the web service:
+
+```
+python WebService.py
+```
+
+and then to run inference on the server:
+```
+python most_similar.py -u http://localhost:5000/api/mostsimilar/ < testfile.txt
+```
+
 ## Group members:
 * Thomas Ørkild - s154433@student.dtu.dk
 * Christian Ingwersen - s154264@student.dtu.dk
