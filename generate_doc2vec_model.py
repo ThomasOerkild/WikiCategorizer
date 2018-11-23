@@ -1,4 +1,4 @@
-from tagged_document_generator import GenerateTaggedDocuments
+from tagged_document_generator import TaggedDocumentGenerator
 import os
 import glob
 from gensim.models.doc2vec import Doc2Vec
@@ -10,7 +10,7 @@ home = os.path.expanduser("~")
 path = os.path.join(home, "Documents", "text")
 files = glob.glob(os.path.join(path, "**/wiki_*"), recursive=True)
 
-trian_corpus = GenerateTaggedDocuments(files)
+trian_corpus = TaggedDocumentGenerator(files)
 model = Doc2Vec(vector_size=100, min_count=2, workers=4)
 model.build_vocab(trian_corpus, progress_per=10000)
 
