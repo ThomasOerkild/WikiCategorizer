@@ -25,10 +25,10 @@ def _main(text, modelname, url, n):
     else:
         raise Exception("You must supply either modelname or ip")
 
-    print(f"-------- TOP {n} similar texts --------")
-    print("TITLE \t SIMILARITY SCORE")
+    print(f"---------------------------- TOP {n} similar texts ----------------------------")
+    print('{:<60}  {:<60}'.format("TITLE", "SIMILARITY SCORE"))
     for i in range(n):
-        print(str(titles[i]) + "\t" + str(scores[i]))
+        print('{:<60}  {:<60}'.format(str(titles[i]), str(scores[i])))
 
 if __name__ == "__main__":
     args = parser.parse_args()
