@@ -39,5 +39,4 @@ class Doc2VecModel:
         query = self.BASE_WIKI_QUERY + ids
         response = urlopen(query)
         dic = json.loads(response.read())
-        return [v['title'] for v in dic['query']['pages'].values()]
-
+        return [v['title']  if 'title' in v else "PageId: " + str(v['pageid']) for v in dic['query']['pages'].values()]
