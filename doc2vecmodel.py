@@ -11,7 +11,18 @@ class Doc2VecModel:
     stopword_list = stopwords.words('english')
 
     def __init__(self, modelname):
-        self.model = Doc2Vec.load(modelname)
+        self.modelname = modelname
+        if self.modelname is None:
+            from tagged_document_generator import TaggedDocumentGenerator
+            import logging
+            logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+            home = os.path.expanduser("~")
+            path = os.path.join(home, "Documents", "text") # Data is assumed to be in ~/Documents/text
+            files = glob.glob(os.path.join(path, "**/wiki_*"), recursive=True)
+            self.model = Doc2Vec(vector_size=200, min_count=5, workers=7)
+            self.model.build_vocab(trian_corpus, progress_per=10000)
+        else:
+            self.model = Doc2Vec.load(self.modelname)
 
     def infer_file(self, filename, n=10):
         with open(filename, 'r') as f:
@@ -27,6 +38,12 @@ class Doc2VecModel:
         scores = [t[1] for t in tops]
         titles = self._get_title_from_pageids(ids)
         return titles, scores
+    
+    def train(self, epochs):
+        import logging
+        logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+        self.model.train(trian_corpus, total_examples=self.model.corpus_count, epochs=epochs, report_delay=10)
+        self.model.save(self.modelname)
 
     def _preprocess(self, string):
         string = string.lower()
