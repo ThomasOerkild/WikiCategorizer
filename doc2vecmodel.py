@@ -11,15 +11,14 @@ import glob
 import os
 from tagged_document_generator import TaggedDocumentGenerator
 from gensim.similarities.index import AnnoyIndexer
+import time
+import logging
 
 
 class NNSMethod(Enum):
     BRUTE = 1
     KD_TREE = 2
     ANNOY = 3
-    
-    def __str__(self):
-        return self.value
 
 
 class Doc2VecModel:
@@ -28,11 +27,9 @@ class Doc2VecModel:
     stopword_list = stopwords.words('english')
 
     def __init__(self, modelname):
+        logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
         self.modelname = modelname
         if self.modelname is None:
-            from tagged_document_generator import TaggedDocumentGenerator
-            import logging
-            logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
             trian_corpus = self._get_training_iterator()
             self.model = Doc2Vec(vector_size=100, min_count=5, workers=7)
             self.model.build_vocab(trian_corpus, progress_per=10000)
@@ -60,8 +57,6 @@ class Doc2VecModel:
         return titles, dists
     
     def train(self, epochs):
-        import logging
-        logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
         trian_corpus = self._get_training_iterator()
         self.model.train(trian_corpus, total_examples=self.model.corpus_count, epochs=epochs, report_delay=10)
         self.model.save(self.modelname)
@@ -79,15 +74,18 @@ class Doc2VecModel:
             self.annoy_indexer.model = self.model
 
     def _calculate_most_similar(self, vector, n, nnsmethod):
+        start_time = time.clock()
         if nnsmethod == NNSMethod.BRUTE:
             tops = self.model.docvecs.most_similar([vector], topn=n)
-            return [t[0] for t in tops], [t[1] for t in tops]
+            dists, indicies = [t[0] for t in tops], [t[1] for t in tops]
         if nnsmethod == NNSMethod.KD_TREE:
             dists, indicies = self.tree.query(vector, k=n)
-            return [self.keys[i] for i in indicies], dists
+            indicies = [self.keys[i] for i in indicies]
         if nnsmethod == NNSMethod.ANNOY:
             tops = self.model.docvecs.most_similar([vector], topn=n, indexer=self.annoy_indexer)
-            return [t[0] for t in tops], [t[1] for t in tops]
+            dists, indicies = [t[0] for t in tops], [t[1] for t in tops]
+        print(f"Time using {nnsmethod} - {time.clock() - start_time}")
+        return dists, indicies
 
     def _preprocess(self, string):
         string = string.lower()
