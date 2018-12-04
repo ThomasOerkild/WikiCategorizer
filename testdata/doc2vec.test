@@ -1,0 +1,22 @@
+There exists two variants of the Doc2Vec model, the
+Distributed Memory Modelof Paragraph Vectors(PV-DM)  and  the
+Distributed Bag of Words version ofParagraph VectorPV-DBOW  [6].   We  will  use  the  first  of  the  two.   In  order
+to obtain a model able to generate a feature representation of a document it
+hasn’t seen before, we will need to train a shallow feed forward neural network,
+that is able to predict the next word, given a context.  The network receives a
+one-hot-encoding of the paragraph id, and a window of one-hot-encoded words
+as input, and the goal for the network is to predict the next word.
+In Figure 5 we see the basic structure of this network, and as it can be seen
+we have two matrices.  A paragraph/document matrix,D, with the dimensions
+N×pand a word matrix W with dimensions M×p, where N is the number
+of documents andMis the number of unique words in the documents.  
+Both of these matrices produce p-dimensional vectors, where p is the desired dimension
+of the features.  We now have four p-dimensional vectors, one for the document
+and one for each of the three preceding words.  These can either be averaged or
+concatenated, to which we went for the concatenation, in order to keep all the
+information. We now have an internal representation vector of the context that is 4·plong.  
+In order to make a prediction in the next word, we have a new matrix, Wout,  which  has  the  dimensions  4p×M.   
+This  gives  us  an  output  vector  of dimension M,  which  we  can  apply  a  softmax  function  to,  in  order  to  obtain 
+a probability for each word.  All the matrices, D , W and Wout are initialized
+to  random  values,  and  we  can  then  use  stochastic  gradient  decent  and  
+back-propagation to minimize the loss between the correct word and the computed word.
