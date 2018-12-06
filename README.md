@@ -3,7 +3,7 @@
 * Thomas Ørkild - s154433@student.dtu.dk
 * Christian Ingwersen - s154264@student.dtu.dk
 
-The final project report can be downloadet from Dropbox [here.](www.dropbox.com)
+The final project report can be downloadet from Dropbox [here.](https://www.dropbox.com/s/eb29nia0dav2dyj/Computational_Tools-final_report.pdf?dl=0)
 
 ## Problem description
 In this project we have investigated different algorithms to find the K nearest Wikipedia articles to a given text. The idea with our tool is that Wikipedia contributers can write a new text and find all the similar articles already on Wikipedia. Our idea is that the contributers then can link these articles in the new text to help the reader find related knowledge. 
