@@ -20,6 +20,7 @@ class NNSMethod(Enum):
     KD_TREE = 2
     ANNOY = 3
 
+NUM_ANNOY_TREES = 50
 
 class Doc2VecModel:
     
@@ -69,9 +70,15 @@ class Doc2VecModel:
             print("Finished building KD tree.")
             self.keys = list(self.model.docvecs.doctags.keys())
         elif nnsmethod == NNSMethod.ANNOY:
-            self.annoy_indexer = AnnoyIndexer()
-            self.annoy_indexer.load(annoymodelpath)
-            self.annoy_indexer.model = self.model
+            if not os.path.isfile(annoymodelpath):
+                print("Generating annoy index...")
+                self.annoy_indexer = AnnoyIndexer(self.model, 50)
+                print("Finished generating annoy index.")
+                self.annoy_indexer.save(annoymodelpath)
+            else:
+                self.annoy_indexer = AnnoyIndexer()
+                self.annoy_indexer.load(annoymodelpath)
+                self.annoy_indexer.model = self.model
 
     def _calculate_most_similar(self, vector, n, nnsmethod):
         start_time = time.clock()

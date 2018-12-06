@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 HOME = os.path.expanduser("~")
-MODEL_PATH = os.path.join(HOME, "Documents", "100vector_model", "my_doc2vec_model_trained")
+MODEL_PATH = os.path.join(HOME, "Documents",  "my_doc2vec_model_trained")
 
 METHOD_DICT = {'brute': NNSMethod.BRUTE, 
                 'kdtree': NNSMethod.KD_TREE, 
